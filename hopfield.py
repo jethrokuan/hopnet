@@ -87,8 +87,8 @@ def learn_maxpl(imgs):
             activations = np.matmul(weights, img) + bias
             output = sigmoid(activations)
             eps = 1e-10
-            img_mask = img.copy()
-            pll += np.sum(np.multiply(img_mask, np.log(output+eps)) + np.multiply(1-img_mask, np.log(1-output+eps)))
+            img[img < 0] = 0
+            pll += np.sum(np.multiply(img, np.log(output+eps)) + np.multiply(1-img, np.log(1-output+eps)))
         if iter % 100 == 0: print(-pll)
         return -pll
 
