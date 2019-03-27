@@ -72,28 +72,33 @@ def learn_maxpl(imgs):
     img_size = np.prod(imgs[0].shape)
 
     # Initialize the weights using Hebbian Rule
-    fake_weights = np.random.rand(img_size, img_size)
-
+    fake_weights = np.zeros((img_size, img_size))
     bias = np.zeros(img_size)
+
+    # for img in imgs:
+    #     weights += np.outer(img, img)/ len(imgs)
 
     def objective(params, iter):
         fake_weights, bias = params
-        weights = fake_weights + fake_weights.T
+        weights = (fake_weights + fake_weights.T) / 2
         pll = 0
         for i in range(len(imgs)):
-            img = np.reshape(imgs[i], (-1, 1))
+            img = np.reshape(imgs[i], -1)
             activations = np.matmul(weights, img) + bias
             output = sigmoid(activations)
-            pll += np.sum(np.log(output))
-        return pll
+            eps = 1e-10
+            img_mask = img.copy()
+            pll += np.sum(np.multiply(img_mask, np.log(output+eps)) + np.multiply(1-img_mask, np.log(1-output+eps)))
+        if iter % 100 == 0: print(-pll)
+        return -pll
 
     g = grad(objective)
 
-    fake_weights, bias = adam(g, (fake_weights, bias), num_iters=100, step_size=0.1)
-    weights = fake_weights + fake_weights.T
-    np.fill_diagonal(weights, 0)
+    fake_weights, bias = adam(g, (fake_weights, bias), num_iters=500, step_size=0.001)
+    weights = (fake_weights + fake_weights.T) / 2
+    for i in range(img_size):
+        weights[i,i] = 0
 
-    plt.imsave('fakeweights_mpl.jpg', fake_weights)
     plt.imsave('weights_mpl.jpg', weights)
     return weights, bias
 
