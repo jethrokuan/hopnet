@@ -160,7 +160,6 @@ def main():
 
     # Recover 1 -- Hebbian
     Wh, bh = learn_hebbian(imgs)
-    print(Wh)
     rimgs_h = recover(cimgs, Wh, bh)
     np.save('hebbian.npy', rimgs_h)
     plot_results(imgs, cimgs, rimgs_h, "hebbian.jpg")
