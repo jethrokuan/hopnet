@@ -6,10 +6,9 @@ Matric No.: Your matric number, Your partner's matric number
 
 
 import matplotlib
-# matplotlib.use('Agg')
 import autograd.numpy as np
 from autograd import grad
-from autograd.misc.optimizers import adam
+from autograd.misc.optimizers import sgd
 import glob
 import matplotlib.pyplot as plt
 from PIL import Image, ImageOps
@@ -72,15 +71,13 @@ def learn_maxpl(imgs):
     img_size = np.prod(imgs[0].shape)
 
     # Initialize the weights using Hebbian Rule
-    fake_weights = np.zeros((img_size, img_size))
-    bias = np.zeros(img_size)
-
-    # for img in imgs:
-    #     weights += np.outer(img, img)/ len(imgs)
+    fake_weights = np.random.normal(0, 0.1, (img_size, img_size))
+    bias = np.random.normal(0, 0.1, (img_size))
+    diag_mask = np.ones((img_size, img_size)) - np.identity(img_size)
 
     def objective(params, iter):
         fake_weights, bias = params
-        weights = (fake_weights + fake_weights.T) / 2
+        weights = np.multiply((fake_weights + fake_weights.T) / 2, diag_mask)
         pll = 0
         for i in range(len(imgs)):
             img = np.reshape(imgs[i], -1)
@@ -94,10 +91,8 @@ def learn_maxpl(imgs):
 
     g = grad(objective)
 
-    fake_weights, bias = adam(g, (fake_weights, bias), num_iters=500, step_size=0.001)
-    weights = (fake_weights + fake_weights.T) / 2
-    for i in range(img_size):
-        weights[i,i] = 0
+    fake_weights, bias = sgd(g, (fake_weights, bias), num_iters=300, step_size=0.001)
+    weights = np.multiply((fake_weights + fake_weights.T) / 2, diag_mask)
 
     plt.imsave('weights_mpl.jpg', weights)
     return weights, bias
@@ -134,7 +129,7 @@ def recover(cimgs, W, b):
     rimgs = []
     for cimg in cimgs:
         x = np.copy(cimg)
-        for itr in range(100):
+        for itr in range(5):
             prev_x = np.copy(x)
             for i in range(x.shape[0]):
                 v = np.matmul(W[i], cimg) + b[i]
@@ -165,6 +160,7 @@ def main():
 
     # Recover 1 -- Hebbian
     Wh, bh = learn_hebbian(imgs)
+    print(Wh)
     rimgs_h = recover(cimgs, Wh, bh)
     np.save('hebbian.npy', rimgs_h)
     plot_results(imgs, cimgs, rimgs_h, "hebbian.jpg")
