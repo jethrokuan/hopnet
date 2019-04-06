@@ -121,14 +121,14 @@ def plot_results(imgs, cimgs, rimgs, fname='result.png'):
     plt.savefig(fname)
 
 
-def recover(cimgs, W, b):
+def recover(cimgs, W, b, max_iter=10):
     img_size = np.prod(cimgs[0].shape)
     ######################################################################
     ######################################################################
     rimgs = []
     for cimg in cimgs:
         x = np.copy(cimg)
-        for itr in range(5):
+        for itr in range(max_iter):
             prev_x = np.copy(x)
             for i in range(x.shape[0]):
                 v = np.matmul(W[i], cimg) + b[i]
