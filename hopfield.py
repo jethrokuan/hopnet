@@ -70,7 +70,6 @@ def learn_maxpl(imgs):
     """Learn the weights and bias for the Hopfield network by maximizing the pseudo log-likelihood."""
     img_size = np.prod(imgs[0].shape)
 
-    # Initialize the weights using Hebbian Rule
     fake_weights = np.random.normal(0, 0.1, (img_size, img_size))
     bias = np.random.normal(0, 0.1, (img_size))
     diag_mask = np.ones((img_size, img_size)) - np.identity(img_size)
