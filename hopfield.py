@@ -1,7 +1,7 @@
 '''
 Description: CS5340 - Hopfield Network
-Name: Your Name, Your partner's name
-Matric No.: Your matric number, Your partner's matric number
+Name: Jethro Kuan, Eugene Lim
+Matric No.: A0158400N, A0168349N
 '''
 
 
